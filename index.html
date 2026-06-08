@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Ce que je ne t'ai pas dit — Carnet de scène</title>
+    <!-- Polices douces style BD / Lou ! de Julien Neel -->
+    <link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@300;400;700&family=Fredoka+One&family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #2b1e16;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Gaegu', 'Quicksand', cursive, sans-serif;
+            overflow-x: hidden;
+            padding: 1rem;
+        }
+
+        /* SCENE PRINCIPALE */
+        .scene-container {
+            position: relative;
+            width: 1300px;
+            max-width: 95vw;
+            height: 85vh;
+            min-height: 580px;
+            background: #1a130c;
+            border-radius: 40px;
+            box-shadow: 0 25px 40px rgba(0,0,0,0.6), inset 0 0 0 1px #efcf9e;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* RIDEAUX velours rouge profond avec plis */
+        .curtain {
+            position: absolute;
+            top: 0;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(135deg, #872222 0%, #5e1515 40%, #3f0e0e 100%);
+            z-index: 20;
+            transition: transform 1.8s cubic-bezier(0.77, 0, 0.18, 1);
+            box-shadow: 0 0 25px rgba(0,0,0,0.7);
+            overflow: hidden;
+        }
+        .curtain::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(90deg,
+                rgba(0,0,0,0.25) 0px, rgba(0,0,0,0.25) 3px,
+                rgba(255,190,120,0.08) 3px, rgba(255,190,120,0.12) 9px,
+                rgba(0,0,0,0.2) 9px, rgba(0,0,0,0.25) 14px);
+            pointer-events: none;
+        }
+        .curtain-left {
+            left: 0;
+            border-radius: 0 20px 20px 0;
+            transform: translateX(0);
+        }
+        .curtain-right {
+            right: 0;
+            border-radius: 20px 0 0 20px;
+            transform: translateX(0);
+        }
+        .curtain.open-left { transform: translateX(-100%); }
+        .curtain.open-right { transform: translateX(100%); }
+
+        /* LE CARNET / SCÈNE INTÉRIEURE */
+        .stage {
+            width: 100%;
+            height: 100%;
+            background: #fef7e8;
+            background-image: 
+                linear-gradient(#e2dac8 1px, transparent 1px),
+                linear-gradient(90deg, #e2dac8 1px, transparent 1px);
+            background-size: 34px 34px;
+            position: relative;
+            overflow-y: auto;
+            padding: 1.8rem;
+            font-family: 'Gaegu', 'Courier New', monospace;
+            box-shadow: inset 0 0 0 6px #f6efdc, inset 0 0 0 12px #f2e5c2;
+        }
+        /* style cahier à lignes doubles */
+        .notebook {
+            max-width: 960px;
+            width: 100%;
+            margin: 0 auto;
+            background: #fffcf3;
+            border-radius: 24px;
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.1), inset 0 1px 0 #fff8e7;
+            padding: 2rem 2rem 2.5rem 2.5rem;
+            position: relative;
+        }
+        .notebook {
+            background: repeating-linear-gradient(
+                #fffcf3,
+                #fffcf3 30px,
+                #d8cfb4 30px,
+                #d8cfb4 31px
+            );
+            background-attachment: local;
+        }
+        .notebook * {
+            background: transparent;
+            margin-top: 0;
+            margin-bottom: 0.4rem;
+        }
+        .notebook p, .notebook div.para, .notebook li {
+            line-height: 1.85;
+            font-size: 1.2rem;
+            color: #2a241b;
+            margin-bottom: 0.9rem;
+        }
+        .notebook h2, .notebook h3, .notebook h4 {
+            font-family: 'Fredoka One', cursive;
+            color: #b45f3b;
+            margin-top: 1.4rem;
+            margin-bottom: 0.6rem;
+            border-bottom: 2px dotted #ecd9b0;
+            display: inline-block;
+            letter-spacing: 1px;
+        }
+        .notebook h2 { font-size: 1.9rem; }
+        .notebook h3 { font-size: 1.6rem; }
+        .notebook hr { margin: 1rem 0; border: 1px solid #eedbba; }
+        .author-note-final {
+            background: #fdf2e0;
+            padding: 1.2rem;
+            border-radius: 28px;
+            margin: 1.5rem 0;
+            border-left: 8px solid #ce9872;
+            font-style: normal;
+            font-size: 1.05rem;
+        }
+        .page-nav {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1.2rem;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+        .nav-btn {
+            background: #ecdbba;
+            border: none;
+            font-size: 1.2rem;
+            font-weight: bold;
+            font-family: 'Gaegu', monospace;
+            padding: 0.5rem 1.5rem;
+            border-radius: 48px;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            color: #572e16;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .nav-btn i { font-size: 1.1rem; }
+        .nav-btn:hover {
+            background: #ffefcf;
+            transform: scale(0.97);
+        }
+        .page-indicator {
+            background: #e9ddc4;
+            padding: 0.4rem 1.5rem;
+            border-radius: 60px;
+            font-weight: bold;
+            color: #442c19;
+        }
+        .reset-curtain {
+            position: absolute;
+            bottom: 16px;
+            left: 16px;
+            z-index: 30;
+            background: #e6cf8f;
+            border: none;
+            border-radius: 40px;
+            padding: 8px 18px;
+            font-family: 'Gaegu', monospace;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+            transition: all 0.2s;
+        }
+        .reset-curtain:hover { background: #ffe2ac; transform: scale(1.02); }
+        .nav-btn:disabled { opacity: 0.5; cursor: default; transform: none; }
+        .stage::-webkit-scrollbar { width: 8px; }
+        .stage::-webkit-scrollbar-track { background: #eedfc7; border-radius: 10px; }
+        .stage::-webkit-scrollbar-thumb { background: #b77c54; border-radius: 10px; }
+        @media (max-width: 700px) {
+            .notebook p { font-size: 0.95rem; line-height: 1.6; }
+            .notebook h2 { font-size: 1.4rem; }
+            .notebook { padding: 1.5rem; }
+            .stage { padding: 0.8rem; }
+        }
+        .small-caps { font-variant: small-caps; }
+    </style>
+</head>
+<body>
+<div class="scene-container">
+    <div class="curtain curtain-left" id="curtainLeft"></div>
+    <div class="curtain curtain-right" id="curtainRight"></div>
+    <div class="stage" id="stageContainer">
+        <div class="notebook" id="notebookRoot">
+            <div id="dynamicPageContent"></div>
+            <div class="page-nav">
+                <button class="nav-btn" id="prevBtn"><i class="fas fa-chevron-left"></i> Page précédente</button>
+                <span class="page-indicator" id="pageIndicator"></span>
+                <button class="nav-btn" id="nextBtn">Page suivante <i class="fas fa-chevron-right"></i></button>
+            </div>
+        </div>
+    </div>
+    <button class="reset-curtain" id="resetCurtainBtn"><i class="fas fa-theater-masks"></i> Rouvrir le rideau</button>
+</div>
+
+<script>
+    // --------------------------------------------------------------
+    // TEXTE INTÉGRAL DU ROMAN "Ce que je ne t'ai pas dit"
+    // Découpé en pages pour une navigation fluide (style carnet double ligne)
+    // Le contenu inclut la note de l'autrice avec la signature Jemina :)
+    // Adaptation fidèle au PDF fourni.
+    // --------------------------------------------------------------
+
+    const FULL_STORY = `
+    <div style="margin-bottom: 0.5rem;"><em style="color:#b47149;">« Parfois, le plus grand courage c'est d'ouvrir le rideau. »</em></div>
+    <h2>Ce que je ne t'ai pas dit</h2>
+    <p><strong>Roman</strong></p>
+    <p>À ceux qui ont gardé le silence trop longtemps, croyant protéger quelqu'un. Et à ceux qui ont attendu des mots qui ne sont jamais venus.</p>
+    
+    <div class="author-note-final" style="margin-top:1rem;">
+    <strong>📖 Note de l'autrice</strong><br><br>
+    J'ai causé du tort à plusieurs personnes à cause de mes silences.<br>
+    Pas parce que je voulais leur faire du mal. Parce que je ne savais pas faire autrement. Parce que parler, pour moi, a toujours été plus dangereux que se taire. Parce qu'à force de vouloir dire la chose exacte, la bonne, celle qui ne blesserait personne, je n'ai rien dit du tout.<br>
+    Et le silence, lui, n'a pas besoin d'être méchant pour faire mal. Il lui suffit d'être absent.<br>
+    Ce livre est né de cette suffocation. De cette sensation d'étouffer sous le poids des attentes que je n'ai pas su nommer — les miennes, celles des autres, celles que j'inventais dans ma tête parce que je ne pouvais pas m'empêcher de tout extrapoler. Chaque regard non échangé devenait une condamnation. Chaque message auquel je ne répondais pas assez vite devenait, dans mon esprit, une preuve de mon indifférence. Et cette indifférence — réelle ou imaginaire, peu importe — me condamnait à rester là, figée, à regarder les gens que j'aimais s'éloigner sans lever le petit doigt.<br>
+    Je ne savais pas, en écrivant Mira, que j'écrivais sur moi.<br>
+    Ou plutôt, je le savais. Je le savais dès la première phrase. Mais je n'avais pas le courage de le dire. Alors j'ai fait ce que je fais toujours : j'ai caché la vérité sous une histoire bien construite, des personnages solides, des chapitres qui s'enchaînent. J'ai fait comme si ce roman parlait d'"une femme" qui "avait peur". Pas de moi.<br>
+    Mais c'est de moi.<br>
+    J'ai peur d'oublier les conséquences de mes actes. Pas les actes eux-mêmes — ceux-là, je les garde, je les retourne, je les examine sous toutes les coutures. J'ai peur d'oublier ce que ça a fait aux autres. J'ai peur de me réveiller un matin et de ne plus me souvenir de la douleur que j'ai causée, parce que si je l'oublie, alors je deviens vraiment la personne indifférente que je crains d'être.<br>
+    Alors j'écris. Pour ne pas oublier. Pour ne pas me pardonner trop vite. Pour que les mots que je n'ai pas dits deviennent, enfin, des phrases sur une page.<br>
+    Ce roman n'est pas une confession. Je ne viens pas demander l'absolution. C'est une tentative — maladroite, incomplète, trop tardive pour certaines personnes — de dire : je voyais. Je savais. J'avais peur. C'était moi le problème, pas vous.<br>
+    À ceux que mes silences ont blessés : je ne peux pas revenir en arrière. Je peux juste arrêter de faire comme si ça n'avait pas d'importance.<br>
+    À ceux qui se reconnaîtront dans Mira : on n'est pas condamnés. On a juste pris de mauvaises habitudes. Ça se défait. Lentement. Une phrase à la fois.<br>
+    <strong>Jemina :)</strong> ^^
+    </div>
+
+    <hr>
+    <h2>PREMIÈRE PARTIE — Ce qui reste quand on s'est tu</h2>
+    <h3>Chapitre 1 — La robe bleue</h3>
+    <p>Il y avait une robe bleue sur le lit. Mira ne l'avait pas remarquée tout de suite. Elle était entrée dans la chambre comme on entre dans les endroits qu'on connaît trop bien pour les voir encore : sans regarder, en laissant son corps se souvenir à sa place. Mais la robe était là, déployée sur le couvre-lit ivoire comme une question qu'on pose sans oser attendre la réponse, et quelque chose en elle s'était figé.</p>
+    <p>Elle la reconnaissait. Elle aurait voulu ne pas la reconnaître, mais c'était ainsi avec la mémoire — elle ne demandait pas la permission. La mémoire entrait par les yeux, par le nez, par le creux de la gorge, et elle remontait jusqu'à des endroits qu'on croyait avoir fermés à clef.</p>
+    <p>La robe était bleue comme le ciel de Libreville en saison sèche, ce bleu particulier, légèrement voilé, qui n'existait nulle part ailleurs dans le monde selon Mira, bien qu'elle n'eût vu que peu de ciels dans sa vie. Un bleu qui avait l'air d'avoir honte d'être beau. La robe avait un col claudine, des boutons nacrés, une ceinture nouée sur le côté. Isabelle la portait le jour où elles avaient mangé des beignets de plantain assis sur le muret de l'église, à l'époque où elles avaient quinze ans et où quinze ans semblait être l'âge le plus important qu'on puisse atteindre.</p>
+    <p>Mira posa sa sacoche sur le sol. S'assit au bord du lit. Resta là un moment, les mains à plat sur ses cuisses, à regarder la robe sans la toucher. Sa mère passa la tête dans l'entrebâillement. — Elle est arrivée ce matin, dit-elle simplement. Avec les affaires. — Je sais. — Tu veux manger quelque chose ? — Non. Merci.</p>
+    <p>Sa mère disparut. Elle savait reconnaître les moments où Mira n'avait besoin de rien d'autre qu'elle-même, et c'était peut-être l'une des seules personnes au monde à qui ce savoir ne coûtait pas. Mira tendit la main et effleura le tissu du bout des doigts. Il était doux, légèrement froissé. Il sentait quelque chose qu'elle ne sut pas nommer tout de suite — un détergent, peut-être, ou quelque chose qui ressemblait à du vétiver, ou simplement l'air d'une maison où quelqu'un avait vécu longtemps. Elle retira sa main.</p>
+    <h3>Isabelle.</h3>
+    <p>Elle n'avait pas dit son prénom à voix haute depuis dix-huit mois. Elle l'avait pensé, bien sûr — on ne pouvait pas s'empêcher de penser à quelqu'un comme Isabelle, c'était comme s'empêcher de penser au soleil — mais elle avait toujours réussi à le maintenir juste en dessous des mots, dans cette zone tiède où les choses existent sans tout à fait être vraies.</p>
+    <p>Mira s'allongea à côté de la robe, les yeux au plafond, les bras le long du corps. Elle avait trente-deux ans. Elle était revenue à Libreville depuis trois semaines, après sept ans passés entre Abidjan et un appartement trop petit à Paris où elle avait fait semblant de construire une vie.</p>
+    <p>Plus tard, cette nuit-là, Mira écrivit dans son carnet : <em>Je ne savais pas que les objets pouvaient faire aussi mal. Je savais que les mots pouvaient faire mal. Je savais que le silence pouvait faire mal. Mais une robe bleue sur un lit — je n'avais pas prévu ça. Je ne t'ai pas dit que je pensais à toi tout le temps pendant ces dix-huit mois. Je pensais que tu le savais. Je pensais que les gens savaient les choses sans qu'on les dise. Je pense encore ça. Je crois que c'est mon problème.</em></p>
+
+    <h3>Chapitre 2 — Ce que Michaël lui dit au téléphone</h3>
+    <p>Michaël avait appelé un jeudi soir, en mai, trois semaines avant que Mira ne rentre à Libreville. Elle était dans son appartement de Paris, elle mangeait des oranges en regardant la pluie sur la fenêtre. — Mira. Elle avait reconnu sa voix immédiatement. — Michaël. Ça fait longtemps. — Oui. Il y eut un silence, et Mira sut qu'il n'appelait pas pour savoir comment elle allait. — Isabelle est à l'hôpital, dit-il enfin. — Qu'est-ce qui s'est passé ? — Elle a... elle a fait quelque chose. Avec des médicaments. Sa voisine l'a trouvée. — Est-ce qu'elle va s'en sortir ? — Oui. Physiquement ça va. Mais Mira... ça fait un moment que ça n'allait pas.</p>
+    <p>Elle savait. Ou plutôt — et c'était là la différence énorme — elle avait su qu'il se passait quelque chose, et elle avait choisi de ne pas approfondir. — Je ne savais pas que c'était à ce point-là, dit-elle. Michaël ne répondit pas tout de suite. — Elle t'a écrit, dit-il finalement. Il y a presque un an. Deux fois. — Par courrier. À l'ancienne adresse de ta mère. Mira ferma les yeux. Les lettres étaient peut-être quelque part dans une boîte. — Je ne les ai pas reçues, répéta-t-elle. — Je sais, dit Michaël. Je ne te dis pas ça pour... — Je sais. Il raccrocha. Elle resta longtemps assise à la table, l'orange abandonnée, puis ouvrit son ordinateur et commença à chercher des billets pour Libreville.</p>
+
+    <h3>Chapitre 3 — Libreville, 1998. La première fois qu’elles se sont parlé</h3>
+    <p>Mira avait huit ans. Elle était assise au dernier rang de l'église protestante du quartier Glass, entre sa mère et sa grand-mère, dans une robe à smocks qui lui grattait le cou, et elle regardait le lustre en comptant combien de fois le pasteur disait le mot Seigneur. Elle en était à dix-sept quand elle sentit quelque chose lui toucher l'épaule. Une petite fille avec des nattes tressées serrées et un ruban vert se penchait vers elle. — T'as vu la dame avec le chapeau rouge ? chuchota-t-elle. — Oui. — Chaque dimanche elle le met. Et le pasteur fait comme si c'était normal. — C'est peut-être normal pour lui. — Non, dit la petite fille. Personne peut voir un chapeau comme ça et trouver ça normal. Moi je m'appelle Isabelle. — Moi c'est Mira. Elles devinrent amies en quelques secondes. C'est ainsi, parfois, avec les amitiés. On vous montre quelque chose et après on ne peut plus regarder le monde comme avant.</p>
+
+    <h3>Chapitre 4 — Ce que Mira comprenait et ce qu'elle ne comprenait pas</h3>
+    <p>Elle comprenait les gens comme d'autres lisent les cartes — avec une précision qui lui venait naturellement. Ce qu'elle comprenait moins bien, c'était elle-même. Il y avait une zone en elle, quelque part entre le sternum et la gorge, qui résistait à l'analyse. Elle savait qu'elle aimait les gens. Profondément, viscéralement. Mais l'amour, chez Mira, ne prenait pas les formes habituelles. Il vivait dans les interstices, dans ce qu'elle n'oubliait jamais, dans ce qu'elle remarquait sans le dire. Le problème était que personne ne pouvait voir un amour qu'on ne montre pas.</p>
+
+    <h3>Chapitre 5 — Prucine</h3>
+    <p>Elle avait dix ans quand Prucine est morte. Prucine avait des tresses avec des perles rouges au bout qui cliquetaient quand elle courait. Elles s'étaient disputées pour une poupée. Mira avait dit : Je veux que tu tombes et que tu te fasses mal. Trois jours plus tard, Prucine traversait la rue et une voiture l'avait renversée. Mira n'avait pas pleuré tout de suite. Mais cette nuit-là, elle se dit : C'est moi. C'est à cause de moi. Elle savait que c'était irrationnel, mais il y a des convictions qui s'installent bas, dans les couches profondes. La conviction de Mira était celle-ci : son attachement pouvait faire du mal. Si tu aimes quelqu'un trop fort, quelque chose de mauvais arrivera. Garde de la distance. Pour les protéger.</p>
+
+    <h2>DEUXIÈME PARTIE — Les années où on grandit trop vite</h2>
+    <h3>Chapitre 6 — Ce qu'Isabelle disait de l'avenir</h3>
+    <p>À quinze ans, Isabelle parlait déjà de l'avenir avec une assurance que Mira admirait. — Et toi ? Comment tu te vois dans dix ans ? — Je sais pas, disait Mira. Isabelle la regardait avec affection et frustration. — T'es bizarre. — Je sais. — C'est pas une insulte. — Je sais ça aussi.</p>
+
+    <h3>Chapitre 7 — La mort de la mère d'Isabelle</h3>
+    <p>Mira avait seize ans quand Mme Koumba mourut. La maladie avait duré huit mois. Isabelle n'en avait presque pas parlé, mais Mira avait vu l'intensité baisser. Elle n'avait pas posé de questions. Elle avait fait ce qu'elle savait faire : être là, physiquement, régulièrement. Un soir Isabelle lui dit : — Elle aimait les fleurs d'hibiscus. — Je sais, dit Mira. Elle les mettait dans un verre sur la table de la cuisine. Isabelle la regarda, puis posa sa tête sur son épaule. Ce n'était peut-être pas tout ce qu'Isabelle avait besoin, mais c'était quelque chose.</p>
+
+    <h3>Chapitre 8 — Lettre non envoyée</h3>
+    <p><em>Isabelle, je t'écris parce que je ne sais pas comment te dire les choses de face. La nuit de l'enterrement de ta maman, quand tu as mis ta tête sur mon épaule, j'ai failli pleurer. De quelque chose qui ressemblait à : je voudrais ne jamais te perdre. Je n'ai pas dit ça. J'aurais dû le dire. Mira</em></p>
+
+    <h3>Chapitre 9 — Abidjan, première année</h3>
+    <p>Elle était partie pour Abidjan à dix-neuf ans. Isabelle était restée. Elles avaient pleuré à l'aéroport. Mira rencontra Émeraude, qui lui dit un jour : — T'as une amie au Gabon dont tu parles jamais. — Elle s'appelle Isabelle. — Pourquoi tu parles pas d'elle ? Mira n'avait pas de réponse. Émeraude hocha la tête : — Elle a de la chance. Parce que j'aurais voulu voir la tête que tu fais pour moi dans ta tête.</p>
+
+    <h3>Chapitre 10 — Daniel</h3>
+    <p>Elle avait rencontré Daniel en deuxième année. Un garçon qui savait quand se taire. Un soir, il lui dit : — Tu caches quelque chose. Toi tu caches par habitude. C'est quoi la blessure ? Elle rit — un rire bref. — Elle s'appelle Prucine. Elle lui raconta. Daniel écouta. Puis il dit : — Tu as dix ans dans cette histoire. Dans ton corps, dans ce que tu fais dans tes relations, t'as encore dix ans. Elle n'oublia jamais.</p>
+
+    <h2>TROISIÈME PARTIE — Les silences qui grandissent</h2>
+    <h3>Chapitre 11 — Le décès de l'oncle d'Isabelle</h3>
+    <p>Mira était en quatrième année à Abidjan quand elle apprit la mort de l'oncle d'Isabelle. Elle reçut un message : "Mon tonton Patrick est décédé. C'est difficile." Mira rangea son téléphone, entra à la bibliothèque, travailla. Ce n'est que le soir qu'elle réalisa. Elle n'avait pas appelé. Elle se dit : demain. Puis : elle a beaucoup de monde autour d'elle. Puis : c'est trop tard. Isabelle avait envoyé un deuxième message : J'espère que tu vas bien. Mira répondit : Oui, je pense à toi. Comment tu vas ? Isabelle : Ça va. On gère. Mira : Je suis là si tu veux parler. Et puis rien. Isabelle ne rappela jamais.</p>
+
+    <h3>Chapitre 12 — Ce qu'Isabelle écrivit (lettre non reçue)</h3>
+    <p><em>Libreville, le 14 mars. Mira, je t'écris à l'ancienne adresse. Mon tonton Patrick est mort il y a quatre mois. Tu le sais. Je t'ai envoyé un message et tu m'as répondu un truc et après c'était le silence. J'ai attendu. T'es pas venue. Tu m'avais dit "je suis là pour toi quoi qu'il arrive." Je te demande juste de me dire que tu es encore là. Tu me manques d'une façon que je n'arrive pas à expliquer. Isabelle</em></p>
+
+    <h3>Chapitre 13 — Ce que Michaël ne dit pas tout de suite</h3>
+    <p>Quand Michaël l'appela, il n'avait pas tout dit. À Libreville, il vint la voir. — Elle a perdu son année à la fac, dit-il. Elle a trouvé un travail, un studio à Akanda, elle voyait presque personne. Et puis ça s'est accumulé. Et toi. Elle disait : Mira a disparu. Comme si t'étais morte. — J'avais pas disparu. — Je sais. Mais dans sa tête, ton silence c'était une confirmation : que même les meilleurs partent. Mira demanda : — Quand est-ce qu'elle sort ? — Dans deux jours. — Elle veut me voir ? — Je lui ai pas dit que tu étais revenue. Mira sentit ses fondations trembler.</p>
+
+    <h3>Chapitre 14 — Ce que Mira ne comprenait pas encore</h3>
+    <p>Elle resta trois jours sans appeler. Elle y pensa constamment, mais ne le fit pas. Le soir du troisième jour, sa mère dit : — Cette amie Sandrine dit qu'Isabelle t'attend. Mira éteignit le feu, prit son téléphone. — Allô ? — Isabelle, c'est Mira. — Pourquoi tu m'appelles maintenant ? — Parce que je suis rentrée. Et parce que j'aurais dû appeler bien avant. — ...Depuis un mois. — Oui. — Tu veux qu'on se voie ? demanda Isabelle. — Oui. Demain, au café avec les chaises rouges. Rendez-vous.</p>
+
+    <h3>Chapitre 15 — Lettre avant les retrouvailles</h3>
+    <p><em>Isabelle, je ne sais pas ce que je vais dire demain. Tu as été la présence la plus constante de ma vie. Ce que je n'ai pas fait, c'est te le dire. Mais je viens. Je viens parce que je suis fatiguée de protéger les gens de mon attachement en disparaissant avant qu'ils puissent l'avoir. Mira</em></p>
+
+    <h2>QUATRIÈME PARTIE — Ce qui reste quand on dit enfin</h2>
+    <h3>Chapitre 16 — Le café avec les chaises rouges</h3>
+    <p>Elle arriva cinq minutes en avance. Isabelle arriva à dix heures cinq. Plus mince, plus lente, mais ses yeux étaient les mêmes. — Bonjour. — Bonjour. La mer par la fenêtre. Isabelle but une gorgée de bissap. — Pourquoi maintenant ? — Parce que Michaël m'a appelée. — Alors si Michaël ne t'avait pas appelée, tu serais pas là. — Peut-être que non. — Je suis désolée pour ton oncle. Je sais que c'est tardif. Isabelle passa le pouce sur la table. — T'as su, et t'as rien fait. Pourquoi ? — J'avais peur. — Peur de quoi ? — De dire les mauvaises choses. De faire plus de mal que de bien. — Tu m'as laissée seule pour pas me faire du mal. — Je sais que ça a pas de sens. — Non. Si. Ça a un sens tordu. C'est toi tout craché.</p>
+
+    <h3>Chapitre 17 — Ce qu'Isabelle dit sur le chemin du retour</h3>
+    <p>Elles parlèrent de choses petites entre les grandes. Puis Isabelle : — Pendant ces dix-huit mois, j'étais dans un endroit très sombre. Et il y avait toi. Pas comme quelqu'un qui m'avait fait du mal. Toi comme quelqu'un qui me manquait. J'ai failli te rendre responsable de tout. Tu n'es pas responsable de tout. Tu es responsable d'une partie. Mais pas de tout. — Tu me demandes pas de te demander pardon ? — Je te demande de comprendre. Le pardon c'est pour moi. La compréhension c'est pour nous deux.</p>
+
+    <h3>Chapitre 18 — Ce que Mira dit à Dieu</h3>
+    <p>Elle pria longtemps. Par terre, les bras sur le lit. Elle pensa à Prucine, à Isabelle, à tout ce qu'elle avait raté par peur. Elle dit : je sais pas si tu peux réparer ça, mais si tu peux juste faire que je sois moins effrayée, ce serait bien.</p>
+
+    <h3>Chapitre 19 — Lambaréné, un dimanche</h3>
+    <p>Deux semaines après, Isabelle proposa d'aller à Lambaréné. Dans le minibus, Isabelle dormit. À l'hôpital Schweitzer, assises devant l'Ogooué, Isabelle dit : — Je t'ai pas pardonnée encore. Mais je suis contente que tu sois là. Les deux peuvent coexister. Et aussi : demande-moi comment je vais. Vraiment. — Comment tu vas ? — Pas super bien, mais mieux qu'avant. Certains jours je vais bien. — C'est bien. — Oui.</p>
+
+    <h3>Chapitre 20 — La robe bleue</h3>
+    <p>Mira apporta la robe. Isabelle la sortit du sac. La regarda longtemps. — T'as pleuré quand tu l'as vue ? — Pas tout de suite. Après. — Je savais que tu pleurerais. T'as toujours eu du retard avec les émotions. — C'est vrai. Isabelle sourit de travers. Elles rirent. Un rire qui venait d'avant.</p>
+
+    <h2>Épilogue — Ce que Mira écrit dans son carnet, des mois plus tard</h2>
+    <p><em>Il fait chaud aujourd'hui. Isabelle et moi on s'est parlé hier soir pendant deux heures. Les choses ordinaires. Je lui ai demandé comment elle allait vraiment. Elle m'a dit que certains jours c'est encore difficile, mais d'autres jours elle se réveille avec l'envie d'un café, d'une promenade. Et que ce désir, même petit, est une victoire. J'ai rangé les lettres que je n'ai jamais envoyées dans une boîte. Je ne les ai pas jetées. Je pense encore à Prucine. Moins comme une culpabilité, plus comme un souvenir. Une fille qui courait vers tout. Je ne sais pas si j'apprendrai à ne plus avoir de retard avec mes émotions. Mais hier soir Isabelle a ri, et dans ce rire il y avait quelque chose qui avait traversé tous ces silences. Ce n'est pas rien.</em></p>
+    <hr>
+    <p><strong>Note finale</strong> — Ce roman s'est terminé mais les personnages continuent. Mira apprend encore. Isabelle guérit encore. Dans une église protestante de Libreville, une très vieille dame porte encore un chapeau rouge, et le pasteur fait comme si c'était normal. Certaines choses ne changent pas. C'est rassurant.</p>
+    <p style="margin-top: 2rem; text-align: right;"><i class="fas fa-feather-alt"></i> « Il y a des silences qui parlent plus fort que n'importe quel mot. »</p>
+    `;
+
+    // Découpage en pages "naturelles" sur les séparateurs <h2> ou <h3> + contenu équilibré
+    // Méthode : on divise la story en fragments basés sur les headings pour créer 12~15 pages.
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = FULL_STORY;
+    // on récupère les enfants (p, h2, h3, div etc)
+    let children = Array.from(tempDiv.children);
+    let pages = [];
+    let currentPageContent = '';
+
+    for (let i = 0; i < children.length; i++) {
+        let el = children[i];
+        let tag = el.tagName.toLowerCase();
+        let isMajorBreak = (tag === 'h2' && !el.innerText.includes('Note de l\'autrice') && !el.innerText.includes('Épilogue')) || tag === 'hr';
+        // on ajoute d'abord l'élément
+        if (currentPageContent === '' && pages.length === 0) {
+            currentPageContent += el.outerHTML;
+        } else {
+            // si c'est un titre majeur et que la page courante a déjà du contenu conséquent, on coupe
+            if (isMajorBreak && currentPageContent.length > 800) {
+                pages.push(currentPageContent);
+                currentPageContent = el.outerHTML;
+            } else {
+                currentPageContent += el.outerHTML;
+            }
+        }
+        // sécurité limite de taille
+        if (currentPageContent.length > 3500 && i < children.length-1 && !isMajorBreak) {
+            pages.push(currentPageContent);
+            currentPageContent = '';
+        }
+    }
+    if (currentPageContent) pages.push(currentPageContent);
+    // si trop peu de pages, on équilibre: on a au moins 8 pages
+    if (pages.length < 6) {
+        // refusion simple
+        pages = [];
+        let chunkSize = Math.ceil(children.length / 8);
+        let temp = [];
+        for(let i=0;i<children.length;i++) {
+            temp.push(children[i].outerHTML);
+            if((i+1) % chunkSize === 0 || i===children.length-1) {
+                pages.push(temp.join(''));
+                temp = [];
+            }
+        }
+    }
+    
+    // pagination
+    let currentIdx = 0;
+    const dynamicDiv = document.getElementById('dynamicPageContent');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const pageIndicatorSpan = document.getElementById('pageIndicator');
+    const curtainLeft = document.getElementById('curtainLeft');
+    const curtainRight = document.getElementById('curtainRight');
+    const resetBtn = document.getElementById('resetCurtainBtn');
+
+    let isOpen = false;
+
+    function renderPage() {
+        dynamicDiv.innerHTML = pages[currentIdx];
+        pageIndicatorSpan.innerText = `Page ${currentIdx+1} / ${pages.length}`;
+        prevBtn.disabled = (currentIdx === 0);
+        nextBtn.disabled = (currentIdx === pages.length-1);
+        prevBtn.style.opacity = (currentIdx===0)?'0.5':'1';
+        nextBtn.style.opacity = (currentIdx===pages.length-1)?'0.5':'1';
+        document.querySelector('.stage')?.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function nextPage() { if(currentIdx < pages.length-1) { currentIdx++; renderPage(); } }
+    function prevPage() { if(currentIdx > 0) { currentIdx--; renderPage(); } }
+
+    async function openCurtains() {
+        curtainLeft.classList.add('open-left');
+        curtainRight.classList.add('open-right');
+        return new Promise(r => setTimeout(r, 1700));
+    }
+    async function closeCurtains() {
+        curtainLeft.classList.remove('open-left');
+        curtainRight.classList.remove('open-right');
+        return new Promise(r => setTimeout(r, 1700));
+    }
+    async function resetAndReopen() {
+        if(isOpen) await closeCurtains();
+        else { curtainLeft.classList.remove('open-left'); curtainRight.classList.remove('open-right'); await new Promise(r=>setTimeout(r,50)); }
+        currentIdx = 0;
+        renderPage();
+        await openCurtains();
+        isOpen = true;
+    }
+    async function init() {
+        renderPage();
+        await openCurtains();
+        isOpen = true;
+    }
+    prevBtn.addEventListener('click', prevPage);
+    nextBtn.addEventListener('click', nextPage);
+    resetBtn.addEventListener('click', async () => { await resetAndReopen(); });
+    init();
+</script>
+</body>
+</html>
